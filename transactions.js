@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db"); // This assumes you have db.js in root
+const db = require("./db"); // This assumes you have db.js in root
 
 // POST endpoint to update balance
 router.post("/update-balance", (req, res) => {

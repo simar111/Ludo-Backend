@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const db = require('../db'); // Importing the shared DB connection
+const db = require('./db'); // Importing the shared DB connection
 const router = express.Router();
 
 // Login API
