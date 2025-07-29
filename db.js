@@ -4,8 +4,8 @@ const mysql = require('mysql2');
 // Create the connection pool
 const db = mysql.createPool({
   host: 'localhost',
-  user: 'agkkubavvn',
-  password: 'w3n6GzuDMS&12340',
+  user: 'root',
+  password: '94666simar',
   database: 'ludo_game_db', // use your actual database name
   connectionLimit: 10, // optional, controls max concurrent connections
 });
