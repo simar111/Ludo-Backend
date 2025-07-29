@@ -28,10 +28,11 @@ router.post("/register", async (req, res) => {
       const hash = await bcrypt.hash(password, 10);
       const salt = `$5$rounds=5000steamedhams${username}$`;
 
-      const insertQuery = `
-        INSERT INTO users (username, hash, salt, Pnumber, image)
-        VALUES (?, ?, ?, ?, ?)
-      `;
+     const insertQuery = `
+  INSERT INTO users (username, hash, salt, Pnumber, profile_index)
+  VALUES (?, ?, ?, ?, ?)
+`;
+
 
       db.query(insertQuery, [username, hash, salt, number, image], (err) => {
         if (err) {
