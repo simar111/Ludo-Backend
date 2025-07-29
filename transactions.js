@@ -1,35 +1,9 @@
 const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const mysql = require("mysql2");
-
-const app = express();
-const PORT = 3000;
-
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// MySQL Connection
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "agkkubavvn",
-  password: "w3n6GzuDMS&12340",
-  database: "agkkubavvn"
-});
-
-// Connect to MySQL
-db.connect((err) => {
-  if (err) {
-    console.error("1: Connection failed", err);
-    return;
-  }
-  console.log("MySQL connected...");
-});
+const router = express.Router();
+const db = require("../db"); // This assumes you have db.js in root
 
 // POST endpoint to update balance
-app.post("/update-balance", (req, res) => {
+router.post("/update-balance", (req, res) => {
   const { username, amount } = req.body;
 
   if (!username || amount === undefined) {
@@ -51,7 +25,7 @@ app.post("/update-balance", (req, res) => {
     const newBalance = currentBalance + parseFloat(amount);
 
     const updateBalanceQuery = "UPDATE users SET TotalBalance = ? WHERE username = ?";
-    db.query(updateBalanceQuery, [newBalance, username], (err, updateResult) => {
+    db.query(updateBalanceQuery, [newBalance, username], (err) => {
       if (err) {
         console.error("4: Balance update failed", err);
         return res.status(500).send("4: Balance update failed");
@@ -62,7 +36,4 @@ app.post("/update-balance", (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = router;

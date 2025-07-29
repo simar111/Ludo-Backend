@@ -1,78 +1,51 @@
+// routes/auth.js
 const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
+const db = require("../db");
 
-const app = express();
-const PORT = 3000;
+const router = express.Router();
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// MySQL Connection
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "agkkubavvn",
-  password: "w3n6GzuDMS&12340",
-  database: "agkkubavvn"
-});
-
-// Connect to DB
-db.connect((err) => {
-  if (err) {
-    console.error("1: Connection failed", err);
-    return;
-  }
-  console.log("MySQL connected...");
-});
-
-// POST endpoint for registration
-app.post("/register", async (req, res) => {
+// POST /register
+router.post("/register", async (req, res) => {
   const { name: username, password, number, image } = req.body;
 
-  if (!username || !password || !number || !image) {
-    return res.status(400).send("Invalid request data");
+  if (!username || !password || !number || typeof image !== "number") {
+    return res.status(400).send("❌ Invalid request data");
   }
 
   const checkQuery = "SELECT username FROM users WHERE username = ?";
   db.query(checkQuery, [username], async (err, result) => {
     if (err) {
-      console.error("2: Query failed", err);
-      return res.status(500).send("2: query failed");
+      console.error("❌ Query error:", err);
+      return res.status(500).send("Server error");
     }
 
     if (result.length > 0) {
-      return res.status(409).send("3: Name exists in database");
-    } else {
-      try {
-        const hash = await bcrypt.hash(password, 10);
-        const salt = `$5$rounds=5000steamedhams${username}$`;
+      return res.status(409).send("⚠️ Username already exists");
+    }
 
-        const insertQuery = `
-          INSERT INTO users (username, hash, salt, Pnumber, image)
-          VALUES (?, ?, ?, ?, ?)
-        `;
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      const salt = `$5$rounds=5000steamedhams${username}$`;
 
-        db.query(insertQuery, [username, hash, salt, number, image], (err, result) => {
-          if (err) {
-            console.error("4: Insert Failed", err);
-            return res.status(500).send("4: Insert Failed");
-          }
+      const insertQuery = `
+        INSERT INTO users (username, hash, salt, Pnumber, image)
+        VALUES (?, ?, ?, ?, ?)
+      `;
 
-          return res.send("0"); // Success
-        });
-      } catch (err) {
-        console.error("Hashing error", err);
-        return res.status(500).send("Password hashing failed");
-      }
+      db.query(insertQuery, [username, hash, salt, number, image], (err) => {
+        if (err) {
+          console.error("❌ Insert failed:", err);
+          return res.status(500).send("Database error");
+        }
+
+        return res.send("0"); // ✅ Success
+      });
+    } catch (err) {
+      console.error("❌ Hashing error:", err);
+      return res.status(500).send("Password hashing failed");
     }
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = router;

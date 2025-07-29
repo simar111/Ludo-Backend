@@ -1,36 +1,10 @@
 const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
 const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
+const db = require('../db'); // Importing the shared DB connection
+const router = express.Router();
 
-const app = express();
-const PORT = 3000;
-
-// Middleware
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-// MySQL connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'agkkubavvn',
-    password: 'w3n6GzuDMS&12340',
-    database: 'agkkubavvn'
-});
-
-// Connect DB
-db.connect((err) => {
-    if (err) {
-        console.error('1: Connection failed', err);
-        return;
-    }
-    console.log('✅ Connected to MySQL DB');
-});
-
-// Login route
-app.post('/login', async (req, res) => {
+// Login API
+router.post('/login', async (req, res) => {
     const { name: username, password } = req.body;
 
     if (!username || !password) {
@@ -41,6 +15,7 @@ app.post('/login', async (req, res) => {
 
     db.query(query, [username], async (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).send('2: Query failed');
         }
 
@@ -50,7 +25,6 @@ app.post('/login', async (req, res) => {
 
         const user = results[0];
 
-        // Compare the stored hashed password with the input
         const passwordMatch = await bcrypt.compare(password, user.hash);
 
         if (!passwordMatch) {
@@ -62,7 +36,4 @@ app.post('/login', async (req, res) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+module.exports = router;
