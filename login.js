@@ -11,7 +11,7 @@ router.post('/login', async (req, res) => {
         return res.status(400).send('Missing username or password');
     }
 
-    const query = `SELECT username, salt, hash, TotalBalance, Pnumber, profile_index FROM users WHERE username = ?`;
+    const query = `SELECT username, salt, password, TotalBalance, Pnumber, profile_index FROM users WHERE username = ?`;
 
     db.query(query, [username], async (err, results) => {
         if (err) {
