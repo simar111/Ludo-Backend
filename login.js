@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
     }
 
     const sql = `
-        SELECT username, salt, password, TotalBalance, Pnumber, profile_index
+        SELECT username, password, TotalBalance, Pnumber, profile_index
         FROM users WHERE username = ?
     `;
 
