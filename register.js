@@ -25,7 +25,8 @@ router.post("/register", async (req, res) => {
     }
 
     try {
-      const password = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
       const salt = `$5$rounds=5000steamedhams${username}$`;
 
      const insertQuery = `
@@ -34,7 +35,7 @@ router.post("/register", async (req, res) => {
 `;
 
 
-      db.query(insertQuery, [username, password, salt, number, image], (err) => {
+      db.query(insertQuery, [username, hashedPassword, salt, number, image], (err) => {
         if (err) {
           console.error("❌ Insert failed:", err);
           return res.status(500).send("Database error");
