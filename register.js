@@ -4,13 +4,12 @@ const db = require("./db");
 const util = require("util");
 
 const router = express.Router();
-const query = util.promisify(db.query).bind(db); // Promisify db.query for async/await
+const query = util.promisify(db.query).bind(db);
 
 // POST /register
 router.post("/register", async (req, res) => {
   const { name: username, password, number, image } = req.body;
 
-  // Input validation
   if (!username || !password || !number || typeof image !== "number") {
     return res.status(400).json({ error: "❌ Invalid request data" });
   }
@@ -22,19 +21,19 @@ router.post("/register", async (req, res) => {
       return res.status(409).json({ error: "⚠️ Username already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash password using bcrypt (salt managed internally)
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds is standard
 
-    // Add user to database
+    // If you need to reference a custom salt string from .env (for other logic)
+    const customSaltPrefix = process.env.CUSTOM_SALT_PREFIX || "";
+
+    // Insert user into DB (salt no longer stored)
     const insertQuery = `
-      INSERT INTO users (username, password, salt, Pnumber, profile_index)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO users (username, password, Pnumber, profile_index)
+      VALUES (?, ?, ?, ?)
     `;
 
-    // Keeping salt logic as per original (though not needed with bcrypt)
-    const salt = `$5$rounds=5000steamedhams${username}$`;
-
-    await query(insertQuery, [username, hashedPassword, salt, number, image]);
+    await query(insertQuery, [username, hashedPassword, number, image]);
 
     return res.status(200).json({ message: "✅ Registration successful" });
   } catch (err) {
