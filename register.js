@@ -41,7 +41,7 @@ router.post("/register", async (req, res) => {
           return res.status(500).send("Database error");
         }
 
-        return res.send("0"); // ✅ Success
+        return res.send("Regitstration SuccessFull"); // ✅ Success
       });
     } catch (err) {
       console.error("❌ Hashing error:", err);
