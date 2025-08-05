@@ -15,8 +15,9 @@ router.post('/login', async (req, res) => {
     }
 
     const sql = `
-        SELECT username, password, TotalBalance, Pnumber, profile_index
-        FROM users WHERE username = ?
+        SELECT username, password, TotalBalance, Pnumber, profile_index, status
+        FROM users 
+        WHERE username = ?
     `;
 
     try {
@@ -27,6 +28,10 @@ router.post('/login', async (req, res) => {
         }
 
         const user = results[0];
+
+        if (user.status !== 'active') {
+            return res.status(403).json({ error: '🚫 Your account is inactive. Please contact support.' });
+        }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
